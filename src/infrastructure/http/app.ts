@@ -1,6 +1,9 @@
-import express, { Express, NextFunction, Request, Response } from 'express';
+import express, { Express } from 'express';
+import { Container } from '../../config/container';
+import { errorHandler } from './errorHandler';
+import { brandsRouter } from './routes/brands.routes';
 
-export const createApp = (): Express => {
+export const createApp = (container: Container): Express => {
   const app = express();
   app.use(express.json());
 
@@ -8,12 +11,9 @@ export const createApp = (): Express => {
     res.json({ status: 'ok' });
   });
 
-  // TODO: brancher les routes (brands, carts, orders, ...)
+  app.use('/brands', brandsRouter(container.brands));
 
-  app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
-  });
+  app.use(errorHandler);
 
   return app;
 };
