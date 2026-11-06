@@ -1,0 +1,12 @@
+import { PrismaClient } from '@prisma/client';
+import { CustomerRepository } from '../../../application/ports/CustomerRepository';
+import { Customer } from '../../../domain/customer/Customer';
+
+export class PrismaCustomerRepository implements CustomerRepository {
+  constructor(private readonly prisma: PrismaClient) {}
+
+  async findAll(): Promise<Customer[]> {
+    const rows = await this.prisma.customer.findMany({ orderBy: { name: 'asc' } });
+    return rows.map((row) => ({ id: row.id, name: row.name }));
+  }
+}

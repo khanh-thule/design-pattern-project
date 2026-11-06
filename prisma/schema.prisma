@@ -7,4 +7,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Les modèles (Order, OrderItem, ...) seront ajoutés au fil des stories.
+enum OrderStatus {
+  pending
+  paid
+  delivered
+  cancelled
+}
+
+model Customer {
+  id     String  @id
+  name   String
+  orders Order[]
+}
+
+model Order {
+  id         String      @id
+  customerId String
+  customer   Customer    @relation(fields: [customerId], references: [id])
+  status     OrderStatus
+  createdAt  DateTime
+
+  @@index([customerId, createdAt])
+}

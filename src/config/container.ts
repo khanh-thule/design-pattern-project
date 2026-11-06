@@ -1,3 +1,5 @@
+import { CustomerRepository } from '../application/ports/CustomerRepository';
+import { OrderRepository } from '../application/ports/OrderRepository';
 import { PaymentGateway } from '../application/ports/PaymentGateway';
 import { BrandRegistry } from '../domain/brand/BrandRegistry';
 import { DaMichele } from '../domain/brand/brands/DaMichele';
@@ -9,6 +11,9 @@ import { PaypalPayment } from '../infrastructure/payment/PaypalPayment';
 import { StripePayment } from '../infrastructure/payment/StripePayment';
 import { PaypalPaymentAdapter } from '../infrastructure/payment/PaypalPaymentAdapter';
 import { StripePaymentAdapter } from '../infrastructure/payment/StripePaymentAdapter';
+import { createPrismaClient } from '../infrastructure/persistence/prisma/prismaClient';
+import { PrismaCustomerRepository } from '../infrastructure/persistence/prisma/PrismaCustomerRepository';
+import { PrismaOrderRepository } from '../infrastructure/persistence/prisma/PrismaOrderRepository';
 
 export const buildContainer = () => {
   const brands = new BrandRegistry([new DaMichele(), new Rossopomodoro(), new Pizzium()]);
@@ -19,7 +24,11 @@ export const buildContainer = () => {
     card: new CardPaymentAdapter(new CardTerminalPayment()),
   };
 
-  return { brands, payments };
+  const prisma = createPrismaClient();
+  const customers: CustomerRepository = new PrismaCustomerRepository(prisma);
+  const orders: OrderRepository = new PrismaOrderRepository(prisma);
+
+  return { brands, payments, customers, orders };
 };
 
 export type Container = ReturnType<typeof buildContainer>;

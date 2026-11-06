@@ -1,13 +1,20 @@
 import { OrderStatus } from './OrderStatus';
 import { OrderStatusListener } from './OrderStatusListener';
 import { OrderState } from './states/OrderState';
-import { PendingState } from './states/PendingState';
+import { stateFromStatus } from './states/stateFromStatus';
 
 export class Order {
-  private state: OrderState = new PendingState();
+  private state: OrderState;
   private readonly listeners = new Set<OrderStatusListener>();
 
-  constructor(readonly id: string) {}
+  constructor(
+    readonly id: string,
+    readonly customerId: string,
+    readonly createdAt: Date,
+    status: OrderStatus = 'pending',
+  ) {
+    this.state = stateFromStatus(status);
+  }
 
   subscribe(listener: OrderStatusListener): void {
     this.listeners.add(listener);
