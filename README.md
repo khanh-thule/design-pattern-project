@@ -9,6 +9,7 @@ API de commande de pizzas pour plusieurs enseignes, réalisée dans le cadre du 
 - US 4: Adapter + port hexagonal : le métier ne dépend que du port `PaymentGateway`, et chaque moyen de paiement (signature différente) est branché via un adapter, donc on passe de l'un à l'autre sans modifier le code métier.
 - US 5: Observer : la commande notifie ses listeners via l'interface `OrderStatusListener` sans les connaître, donc ajouter un canal ne modifie pas `Order`, et on active ou désactive un listener avec `subscribe` / `unsubscribe`.
  Statuts de commande : State : chaque statut est une classe qui décide des transitions qu'elle autorise, une transition interdite est refusée avant toute notification.
+- US 6: Memento : le panier crée des snapshots opaques de son état que `CartHistory` garde sans pouvoir les lire, donc on fait undo/redo sans exposer les détails internes du panier.
 
 ## Stack
 

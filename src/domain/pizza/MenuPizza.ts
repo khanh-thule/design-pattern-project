@@ -14,4 +14,8 @@ export class MenuPizza {
   price(): number {
     return this.sizing.apply(this.basePrice, this.size);
   }
+
+  withSize(size: Size): MenuPizza {
+    return new MenuPizza(this.label, this.basePrice, size, this.sizing);
+  }
 }
