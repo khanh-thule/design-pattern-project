@@ -2,11 +2,13 @@
 
 API de commande de pizzas pour plusieurs enseignes, réalisée dans le cadre du module **Design Patterns**.
 
-## Design Pattern utilisés:
+## Design Patterns utilisés:
 - US 1: Factory: la classe abstraite contient la logique commune (orderPizza) et délègue aux sous-classes la création des objets propres à chaque enseigne(son menu, sa règle de prix par taille).
 - US 2: Strategy: chaque réduction (standard, Happy Hour, code promo, fidélité) est un algorithme interchangeable derrière l'interface `PricingStrategy`, donc ajouter une réduction revient à créer une nouvelle classe sans modifier le code existant (Open/Closed).
 - US 3: Chain of Responsibility : chaque règle de validation est un maillon indépendant qui rejette la commande ou la passe au suivant, donc la première erreur arrête la chaîne et ajouter une règle revient à ajouter un maillon.
 - US 4: Adapter + port hexagonal : le métier ne dépend que du port `PaymentGateway`, et chaque moyen de paiement (signature différente) est branché via un adapter, donc on passe de l'un à l'autre sans modifier le code métier.
+- US 5: Observer : la commande notifie ses listeners via l'interface `OrderStatusListener` sans les connaître, donc ajouter un canal ne modifie pas `Order`, et on active ou désactive un listener avec `subscribe` / `unsubscribe`.
+ Statuts de commande : State : chaque statut est une classe qui décide des transitions qu'elle autorise, une transition interdite est refusée avant toute notification.
 
 ## Stack
 
