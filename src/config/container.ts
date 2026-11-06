@@ -79,7 +79,7 @@ export const buildContainer = (env: Env) => {
 
   const auth = new AuthService(customers, new BcryptPasswordHasher(), new JwtTokenService(env.JWT_SECRET));
 
-  return { brands, payments, customers, orders, carts, orderService, auth };
+  return { brands, payments, pricings, customers, orders, carts, orderService, auth };
 };
 
 export type Container = ReturnType<typeof buildContainer>;

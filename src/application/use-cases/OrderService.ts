@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { Order } from '../../domain/order/Order';
 import { OrderStatusListener } from '../../domain/order/OrderStatusListener';
+import { subtotal } from '../../domain/pizza/subtotal';
 import { PricingFactory, PricingStrategy } from '../../domain/pricing/PricingStrategy';
 import { DomainError, NotFoundError } from '../../domain/shared/DomainError';
 import { CustomerRepository } from '../ports/CustomerRepository';
@@ -36,8 +37,7 @@ export class OrderService {
     const pizzas = session?.cart.getPizzas() ?? [];
     this.deps.validator.validate({ pizzas, zipCode: input.zipCode, date: new Date() });
 
-    const subtotal = pizzas.reduce((sum, pizza) => sum + pizza.price(), 0);
-    const total = this.pricingFor(input).apply(subtotal);
+    const total = this.pricingFor(input).apply(subtotal(pizzas));
     this.paymentFor(input.paymentMethod).pay(total);
 
     const lines = pizzas.map((pizza) => ({ ...pizza.recipe(), label: pizza.label, price: pizza.price() }));

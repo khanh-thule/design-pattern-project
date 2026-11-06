@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { CartService, CartSession } from '../../../application/use-cases/CartService';
 import { Ingredient, INGREDIENTS } from '../../../domain/pizza/custom/Ingredient';
 import { SIZES } from '../../../domain/pizza/Size';
-import { round2 } from '../../../domain/shared/money';
+import { subtotal } from '../../../domain/pizza/subtotal';
 
 const SizeSchema = z.enum(SIZES);
 const AddPizzaBody = z.union([
@@ -23,7 +23,7 @@ export const cartToJson = (session?: CartSession) => {
   return {
     brandId: session?.brand.id ?? null,
     pizzas: pizzas.map((pizza, index) => ({ index, label: pizza.label, size: pizza.size, price: pizza.price() })),
-    subtotal: round2(pizzas.reduce((sum, pizza) => sum + pizza.price(), 0)),
+    subtotal: subtotal(pizzas),
   };
 };
 

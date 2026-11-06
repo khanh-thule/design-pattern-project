@@ -6,7 +6,7 @@ import { Dough, IngredientDecorator, PizzaComponent } from './PizzaComponent';
 
 export class CustomPizza implements Pizza {
   readonly label = 'Pizza personnalisée';
-  private readonly component: PizzaComponent;
+  private readonly computedPrice: number;
 
   constructor(
     private readonly base: PizzaBase,
@@ -14,15 +14,15 @@ export class CustomPizza implements Pizza {
     readonly size: Size,
     private readonly sizing: SizePricingRule,
   ) {
-    this.component = ingredients.reduce<PizzaComponent>(
+    const component = ingredients.reduce<PizzaComponent>(
       (pizza, ingredient) => new IngredientDecorator(pizza, ingredient),
       new Dough(base),
     );
-    sizing.apply(this.component.cost(), size);
+    this.computedPrice = sizing.apply(component.cost(), size);
   }
 
   price(): number {
-    return this.sizing.apply(this.component.cost(), this.size);
+    return this.computedPrice;
   }
 
   withSize(size: Size): Pizza {

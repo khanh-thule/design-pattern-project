@@ -14,6 +14,13 @@ API de commande de pizzas pour plusieurs enseignes, réalisée dans le cadre du 
 - US 8: Decorator : chaque ingrédient enveloppe la pizza et ajoute son prix à celui de la pâte, donc on compose n'importe quelle combinaison sans une classe par combinaison, et la taille s'applique ensuite via la règle de l'enseigne.
 - US 9: Repository + port hexagonal : le métier et la route ne dépendent que de `OrderRepository`, et l'adapter Prisma (tri et filtre faits par PostgreSQL) peut être remplacé par l'adapter en mémoire sans rien changer d'autre.
 
+## SOLID
+- S: chaque règle de validation, stratégie de prix, état de commande et adapter est une petite classe qui fait une seule chose ; `Cart` gère son contenu et `CartHistory` son historique ; `CustomerRepository` lit les données et `PasswordHasher` compare les mots de passe.
+- O: ajouter une enseigne, une réduction, un moyen de paiement, un listener ou une règle de validation se fait en ajoutant une classe et une ligne dans le container, sans modifier le code existant.
+- L: `MenuPizza` et `CustomPizza` sont interchangeables partout où une `Pizza` est attendue (panier, validation, Memento, commande) ; les adapters `OrderRepository` Prisma et en mémoire passent les mêmes tests.
+- I: des ports courts et ciblés (`PaymentGateway.pay`, `OrderStatusListener.onStatusChanged`, `PasswordHasher.verify`, `TokenService.sign/verify`), donc personne ne dépend de méthodes qu'il n'utilise pas.
+- D: les services et les routes dépendent des ports, jamais de Prisma, bcrypt, jsonwebtoken ou des prestataires de paiement.
+
 ## Stack
 
 - **TypeScript** + **Node.js 22**
