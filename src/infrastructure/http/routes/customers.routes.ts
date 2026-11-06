@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { CustomerRepository } from '../../../application/ports/CustomerRepository';
 import { OrderRepository } from '../../../application/ports/OrderRepository';
 import { ORDER_STATUSES } from '../../../domain/order/OrderStatus';
+import { orderToJson } from './orders.routes';
 
 const HistoryQuery = z.object({ status: z.enum(ORDER_STATUSES).optional() });
 
@@ -21,7 +22,7 @@ export const customersRouter = (customers: CustomerRepository, orders: OrderRepo
     }
 
     const history = await orders.findByCustomer(req.params.customerId, query.data.status);
-    res.json(history.map((order) => ({ id: order.id, status: order.getStatus(), createdAt: order.createdAt })));
+    res.json(history.map(orderToJson));
   });
 
   return router;

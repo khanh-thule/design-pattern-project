@@ -2,14 +2,11 @@ import { BrandRegistry } from '../../domain/brand/BrandRegistry';
 import { Pizzeria } from '../../domain/brand/Pizzeria';
 import { Cart } from '../../domain/cart/Cart';
 import { CartHistory } from '../../domain/cart/CartHistory';
-import { Ingredient, PizzaBase } from '../../domain/pizza/custom/Ingredient';
-import { Pizza } from '../../domain/pizza/Pizza';
+import { Pizza, PizzaRecipe } from '../../domain/pizza/Pizza';
 import { Size } from '../../domain/pizza/Size';
 import { DomainError, NotFoundError } from '../../domain/shared/DomainError';
 
-export type PizzaRequest =
-  | { brandId: string; pizza: string; size: Size }
-  | { brandId: string; base: PizzaBase; size: Size; ingredients: Ingredient[] };
+export type PizzaRequest = PizzaRecipe & { brandId: string };
 
 export interface CartSession {
   readonly brand: Pizzeria;

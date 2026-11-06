@@ -1,7 +1,6 @@
 import { DomainError } from '../shared/DomainError';
 import { CustomPizza } from '../pizza/custom/CustomPizza';
 import { Ingredient, PizzaBase } from '../pizza/custom/Ingredient';
-import { Dough, IngredientDecorator, PizzaComponent } from '../pizza/custom/PizzaComponent';
 import { MenuPizza } from '../pizza/MenuPizza';
 import { Pizza } from '../pizza/Pizza';
 import { Size } from '../pizza/Size';
@@ -36,10 +35,6 @@ export abstract class Pizzeria {
   }
 
   customPizza(base: PizzaBase, size: Size, ingredients: readonly Ingredient[]): Pizza {
-    const component = ingredients.reduce<PizzaComponent>(
-      (pizza, ingredient) => new IngredientDecorator(pizza, ingredient),
-      new Dough(base),
-    );
-    return new CustomPizza(component, size, this.createSizePricingRule());
+    return new CustomPizza(base, ingredients, size, this.createSizePricingRule());
   }
 }

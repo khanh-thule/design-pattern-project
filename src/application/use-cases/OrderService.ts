@@ -7,7 +7,7 @@ import { CustomerRepository } from '../ports/CustomerRepository';
 import { OrderRepository } from '../ports/OrderRepository';
 import { PaymentGateway } from '../ports/PaymentGateway';
 import { OrderValidator } from '../validation/OrderValidator';
-import { CartService } from './CartService';
+import { CartService, CartSession } from './CartService';
 
 export interface PlaceOrderInput {
   zipCode: string;
@@ -29,22 +29,37 @@ export interface OrderServiceDeps {
 export class OrderService {
   constructor(private readonly deps: OrderServiceDeps) {}
 
-  async place(customerId: string, input: PlaceOrderInput): Promise<{ order: Order; total: number }> {
+  async place(customerId: string, input: PlaceOrderInput): Promise<Order> {
     if (!(await this.deps.customers.findById(customerId))) throw new NotFoundError(`Client "${customerId}"`);
 
-    const pizzas = this.deps.carts.get(customerId)?.cart.getPizzas() ?? [];
+    const session = this.deps.carts.get(customerId);
+    const pizzas = session?.cart.getPizzas() ?? [];
     this.deps.validator.validate({ pizzas, zipCode: input.zipCode, date: new Date() });
 
     const subtotal = pizzas.reduce((sum, pizza) => sum + pizza.price(), 0);
     const total = this.pricingFor(input).apply(subtotal);
     this.paymentFor(input.paymentMethod).pay(total);
 
-    const order = this.withListeners(new Order(randomUUID(), customerId, new Date()));
+    const lines = pizzas.map((pizza) => ({ ...pizza.recipe(), label: pizza.label, price: pizza.price() }));
+    const order = this.withListeners(new Order(randomUUID(), customerId, new Date(), session!.brand.id, lines, total));
     order.pay();
     await this.deps.orders.save(order);
     this.deps.carts.clear(customerId);
 
-    return { order, total };
+    return order;
+  }
+
+  async find(customerId: string, orderId: string): Promise<Order> {
+    const order = await this.deps.orders.findById(orderId);
+    if (!order || order.customerId !== customerId) throw new NotFoundError(`Commande "${orderId}"`);
+    return order;
+  }
+
+  async reorder(customerId: string, orderId: string): Promise<CartSession | undefined> {
+    const order = await this.find(customerId, orderId);
+    this.deps.carts.clear(customerId);
+    order.lines.forEach((line) => this.deps.carts.add(customerId, { ...line, brandId: order.brandId }));
+    return this.deps.carts.get(customerId);
   }
 
   deliver(orderId: string): Promise<Order> {

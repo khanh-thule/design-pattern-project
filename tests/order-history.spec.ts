@@ -7,10 +7,10 @@ describe('US 9 - Historique des commandes', () => {
 
   beforeEach(async () => {
     orders = new InMemoryOrderRepository();
-    await orders.save(new Order('a', 'alice', new Date('2026-11-01'), 'delivered'));
-    await orders.save(new Order('b', 'alice', new Date('2026-11-03'), 'cancelled'));
-    await orders.save(new Order('c', 'alice', new Date('2026-11-02'), 'delivered'));
-    await orders.save(new Order('d', 'bob', new Date('2026-11-04'), 'delivered'));
+    await orders.save(new Order('a', 'alice', new Date('2026-11-01'), 'da-michele', [], 0, 'delivered'));
+    await orders.save(new Order('b', 'alice', new Date('2026-11-03'), 'da-michele', [], 0, 'cancelled'));
+    await orders.save(new Order('c', 'alice', new Date('2026-11-02'), 'da-michele', [], 0, 'delivered'));
+    await orders.save(new Order('d', 'bob', new Date('2026-11-04'), 'da-michele', [], 0, 'delivered'));
   });
 
   const ids = (list: Order[]) => list.map((o) => o.id);

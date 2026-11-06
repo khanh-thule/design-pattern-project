@@ -1,3 +1,4 @@
+import { OrderLine } from './OrderLine';
 import { OrderStatus } from './OrderStatus';
 import { OrderStatusListener } from './OrderStatusListener';
 import { OrderState } from './states/OrderState';
@@ -11,6 +12,9 @@ export class Order {
     readonly id: string,
     readonly customerId: string,
     readonly createdAt: Date,
+    readonly brandId: string,
+    readonly lines: readonly OrderLine[],
+    readonly total: number,
     status: OrderStatus = 'pending',
   ) {
     this.state = stateFromStatus(status);

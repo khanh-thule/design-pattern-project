@@ -25,6 +25,9 @@ model Order {
   id         String      @id
   customerId String
   customer   Customer    @relation(fields: [customerId], references: [id])
+  brandId    String
+  lines      Json
+  total      Float
   status     OrderStatus
   createdAt  DateTime
 

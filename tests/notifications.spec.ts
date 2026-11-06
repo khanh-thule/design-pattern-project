@@ -14,7 +14,7 @@ describe('US 5 - Notifications', () => {
   afterEach(() => vi.restoreAllMocks());
 
   it('notifie tous les listeners quand le statut change', () => {
-    const order = new Order('42', 'client-1', new Date());
+    const order = new Order('42', 'client-1', new Date(), 'da-michele', [], 0);
     order.subscribe(new EmailListener());
     order.subscribe(new SmsListener());
 
@@ -26,7 +26,7 @@ describe('US 5 - Notifications', () => {
   });
 
   it("ne notifie plus un listener désactivé", () => {
-    const order = new Order('42', 'client-1', new Date());
+    const order = new Order('42', 'client-1', new Date(), 'da-michele', [], 0);
     const sms = new SmsListener();
     order.subscribe(new EmailListener());
     order.subscribe(sms);
@@ -44,7 +44,7 @@ describe('US 5 - Notifications', () => {
         console.log(`[Push] Commande ${orderId} : ${status}`);
       }
     }
-    const order = new Order('42', 'client-1', new Date());
+    const order = new Order('42', 'client-1', new Date(), 'da-michele', [], 0);
     order.subscribe(new PushListener());
 
     order.cancel();

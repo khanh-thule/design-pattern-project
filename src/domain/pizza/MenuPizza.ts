@@ -1,4 +1,4 @@
-import { Pizza } from './Pizza';
+import { Pizza, PizzaRecipe } from './Pizza';
 import { Size } from './Size';
 import { SizePricingRule } from './SizePricingRule';
 
@@ -18,5 +18,9 @@ export class MenuPizza implements Pizza {
 
   withSize(size: Size): MenuPizza {
     return new MenuPizza(this.label, this.basePrice, size, this.sizing);
+  }
+
+  recipe(): PizzaRecipe {
+    return { pizza: this.label, size: this.size };
   }
 }

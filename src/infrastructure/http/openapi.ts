@@ -112,12 +112,35 @@ export const openApiSpec = {
           },
         }),
         responses: {
-          201: { description: 'Commande payée', ...json({ allOf: [ref('Order'), { type: 'object', properties: { total: { type: 'number' } } }] }) },
+          201: { description: 'Commande payée', ...json(ref('Order')) },
           400: error('Corps invalide'),
           ...authErrors,
           404: error('Client introuvable'),
           422: error('Validation refusée (panier vide, minimum, zone, horaires, stock, réduction ou code promo…)'),
         },
+      },
+    },
+
+    '/customers/{customerId}/orders/{orderId}': {
+      get: {
+        tags: ['Commandes'],
+        summary: "Détail d'une commande, avec ses pizzas (US 9 : reconsulter)",
+        ...secured,
+        parameters: [customerId, orderId],
+        responses: {
+          200: { description: 'Commande', ...json({ allOf: [ref('Order'), { type: 'object', properties: { lines: { type: 'array', items: ref('OrderLine') } } }] }) },
+          ...authErrors,
+          404: error('Commande introuvable'),
+        },
+      },
+    },
+    '/customers/{customerId}/orders/{orderId}/reorder': {
+      post: {
+        tags: ['Commandes'],
+        summary: 'Remplace le panier par les pizzas de la commande, aux prix actuels (US 9 : recommander)',
+        ...secured,
+        parameters: [customerId, orderId],
+        responses: { ...cartResponse, 404: error('Commande introuvable') },
       },
     },
 
@@ -205,6 +228,20 @@ export const openApiSpec = {
           id: { type: 'string' },
           status: { type: 'string', enum: ORDER_STATUSES },
           createdAt: { type: 'string', format: 'date-time' },
+          brandId: { type: 'string' },
+          total: { type: 'number' },
+        },
+      },
+      OrderLine: {
+        type: 'object',
+        description: 'Pizza du menu (pizza) ou personnalisée (base + ingredients), avec son prix au moment de la commande',
+        properties: {
+          label: { type: 'string' },
+          size: { type: 'string', enum: SIZES },
+          price: { type: 'number' },
+          pizza: { type: 'string' },
+          base: { type: 'string', enum: ['tomato', 'cream'] },
+          ingredients: { type: 'array', items: { type: 'string', enum: Object.keys(INGREDIENTS) } },
         },
       },
       Cart: {

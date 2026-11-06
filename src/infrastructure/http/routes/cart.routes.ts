@@ -18,7 +18,7 @@ const AddPizzaBody = z.union([
 const ChangeSizeBody = z.object({ size: SizeSchema });
 const Index = z.coerce.number().int().nonnegative();
 
-const toJson = (session?: CartSession) => {
+export const cartToJson = (session?: CartSession) => {
   const pizzas = session?.cart.getPizzas() ?? [];
   return {
     brandId: session?.brand.id ?? null,
@@ -31,28 +31,28 @@ export const cartRouter = (carts: CartService): Router => {
   const router = Router();
 
   router.get('/customers/:customerId/cart', (req, res) => {
-    res.json(toJson(carts.get(req.params.customerId)));
+    res.json(cartToJson(carts.get(req.params.customerId)));
   });
 
   router.post('/customers/:customerId/cart/pizzas', (req, res) => {
-    res.status(201).json(toJson(carts.add(req.params.customerId, AddPizzaBody.parse(req.body))));
+    res.status(201).json(cartToJson(carts.add(req.params.customerId, AddPizzaBody.parse(req.body))));
   });
 
   router.patch('/customers/:customerId/cart/pizzas/:index', (req, res) => {
     const { size } = ChangeSizeBody.parse(req.body);
-    res.json(toJson(carts.changeSize(req.params.customerId, Index.parse(req.params.index), size)));
+    res.json(cartToJson(carts.changeSize(req.params.customerId, Index.parse(req.params.index), size)));
   });
 
   router.delete('/customers/:customerId/cart/pizzas/:index', (req, res) => {
-    res.json(toJson(carts.remove(req.params.customerId, Index.parse(req.params.index))));
+    res.json(cartToJson(carts.remove(req.params.customerId, Index.parse(req.params.index))));
   });
 
   router.post('/customers/:customerId/cart/undo', (req, res) => {
-    res.json(toJson(carts.undo(req.params.customerId)));
+    res.json(cartToJson(carts.undo(req.params.customerId)));
   });
 
   router.post('/customers/:customerId/cart/redo', (req, res) => {
-    res.json(toJson(carts.redo(req.params.customerId)));
+    res.json(cartToJson(carts.redo(req.params.customerId)));
   });
 
   return router;
