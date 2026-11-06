@@ -6,6 +6,7 @@ API de commande de pizzas pour plusieurs enseignes, réalisée dans le cadre du 
 - US 1: Factory: la classe abstraite contient la logique commune (orderPizza) et délègue aux sous-classes la création des objets propres à chaque enseigne(son menu, sa règle de prix par taille).
 - US 2: Strategy: chaque réduction (standard, Happy Hour, code promo, fidélité) est un algorithme interchangeable derrière l'interface `PricingStrategy`, donc ajouter une réduction revient à créer une nouvelle classe sans modifier le code existant (Open/Closed).
 - US 3: Chain of Responsibility : chaque règle de validation est un maillon indépendant qui rejette la commande ou la passe au suivant, donc la première erreur arrête la chaîne et ajouter une règle revient à ajouter un maillon.
+- US 4: Adapter + port hexagonal : le métier ne dépend que du port `PaymentGateway`, et chaque moyen de paiement (signature différente) est branché via un adapter, donc on passe de l'un à l'autre sans modifier le code métier.
 
 ## Stack
 
