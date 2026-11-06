@@ -19,6 +19,7 @@ import { PricingFactory } from '../domain/pricing/PricingStrategy';
 import { PromoCodePricing } from '../domain/pricing/PromoCodePricing';
 import { StandardPricing } from '../domain/pricing/StandardPricing';
 import { DomainError } from '../domain/shared/DomainError';
+import { BcryptPasswordHasher } from '../infrastructure/auth/BcryptPasswordHasher';
 import { JwtTokenService } from '../infrastructure/auth/JwtTokenService';
 import { EmailListener } from '../infrastructure/notifications/EmailListener';
 import { SmsListener } from '../infrastructure/notifications/SmsListener';
@@ -76,7 +77,7 @@ export const buildContainer = (env: Env) => {
     customers,
   });
 
-  const auth = new AuthService(customers, new JwtTokenService(env.JWT_SECRET));
+  const auth = new AuthService(customers, new BcryptPasswordHasher(), new JwtTokenService(env.JWT_SECRET));
 
   return { brands, payments, customers, orders, carts, orderService, auth };
 };

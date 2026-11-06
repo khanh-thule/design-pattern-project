@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
 import { CustomerRepository } from '../../../application/ports/CustomerRepository';
 import { Customer } from '../../../domain/customer/Customer';
 
@@ -16,8 +15,8 @@ export class PrismaCustomerRepository implements CustomerRepository {
     return row && { id: row.id, name: row.name };
   }
 
-  async checkPassword(id: string, password: string): Promise<boolean> {
+  async findPasswordHash(id: string): Promise<string | null> {
     const row = await this.prisma.customer.findUnique({ where: { id }, select: { passwordHash: true } });
-    return row !== null && bcrypt.compare(password, row.passwordHash);
+    return row?.passwordHash ?? null;
   }
 }

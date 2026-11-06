@@ -1,6 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import { UnauthorizedError } from '../../domain/shared/DomainError';
 import { CustomerRepository } from '../ports/CustomerRepository';
+import { PasswordHasher } from '../ports/PasswordHasher';
 import { TokenService } from '../ports/TokenService';
 
 const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -10,11 +11,13 @@ export class AuthService {
 
   constructor(
     private readonly customers: CustomerRepository,
+    private readonly hasher: PasswordHasher,
     private readonly tokens: TokenService,
   ) {}
 
   async login(customerId: string, password: string): Promise<{ accessToken: string; refreshToken: string }> {
-    if (!(await this.customers.checkPassword(customerId, password))) {
+    const hash = await this.customers.findPasswordHash(customerId);
+    if (!hash || !(await this.hasher.verify(password, hash))) {
       throw new UnauthorizedError('Identifiants invalides');
     }
     const refreshToken = randomBytes(32).toString('hex');
