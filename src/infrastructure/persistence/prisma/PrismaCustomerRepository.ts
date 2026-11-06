@@ -9,4 +9,9 @@ export class PrismaCustomerRepository implements CustomerRepository {
     const rows = await this.prisma.customer.findMany({ orderBy: { name: 'asc' } });
     return rows.map((row) => ({ id: row.id, name: row.name }));
   }
+
+  async findById(id: string): Promise<Customer | null> {
+    const row = await this.prisma.customer.findUnique({ where: { id } });
+    return row && { id: row.id, name: row.name };
+  }
 }

@@ -2,7 +2,9 @@ import express, { Express } from 'express';
 import { Container } from '../../config/container';
 import { errorHandler } from './errorHandler';
 import { brandsRouter } from './routes/brands.routes';
+import { cartRouter } from './routes/cart.routes';
 import { customersRouter } from './routes/customers.routes';
+import { ordersRouter } from './routes/orders.routes';
 
 export const createApp = (container: Container): Express => {
   const app = express();
@@ -14,6 +16,8 @@ export const createApp = (container: Container): Express => {
 
   app.use('/brands', brandsRouter(container.brands));
   app.use('/customers', customersRouter(container.customers, container.orders));
+  app.use(cartRouter(container.carts));
+  app.use(ordersRouter(container.orderService));
 
   app.use(errorHandler);
 

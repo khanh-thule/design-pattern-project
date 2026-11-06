@@ -1,0 +1,59 @@
+import { Router } from 'express';
+import { z } from 'zod';
+import { CartService, CartSession } from '../../../application/use-cases/CartService';
+import { Ingredient, INGREDIENTS } from '../../../domain/pizza/custom/Ingredient';
+import { SIZES } from '../../../domain/pizza/Size';
+import { round2 } from '../../../domain/shared/money';
+
+const SizeSchema = z.enum(SIZES);
+const AddPizzaBody = z.union([
+  z.object({ brandId: z.string(), pizza: z.string(), size: SizeSchema }),
+  z.object({
+    brandId: z.string(),
+    base: z.enum(['tomato', 'cream']),
+    size: SizeSchema,
+    ingredients: z.array(z.enum(Object.keys(INGREDIENTS) as [Ingredient, ...Ingredient[]])),
+  }),
+]);
+const ChangeSizeBody = z.object({ size: SizeSchema });
+const Index = z.coerce.number().int().nonnegative();
+
+const toJson = (session?: CartSession) => {
+  const pizzas = session?.cart.getPizzas() ?? [];
+  return {
+    brandId: session?.brand.id ?? null,
+    pizzas: pizzas.map((pizza, index) => ({ index, label: pizza.label, size: pizza.size, price: pizza.price() })),
+    subtotal: round2(pizzas.reduce((sum, pizza) => sum + pizza.price(), 0)),
+  };
+};
+
+export const cartRouter = (carts: CartService): Router => {
+  const router = Router();
+
+  router.get('/customers/:customerId/cart', (req, res) => {
+    res.json(toJson(carts.get(req.params.customerId)));
+  });
+
+  router.post('/customers/:customerId/cart/pizzas', (req, res) => {
+    res.status(201).json(toJson(carts.add(req.params.customerId, AddPizzaBody.parse(req.body))));
+  });
+
+  router.patch('/customers/:customerId/cart/pizzas/:index', (req, res) => {
+    const { size } = ChangeSizeBody.parse(req.body);
+    res.json(toJson(carts.changeSize(req.params.customerId, Index.parse(req.params.index), size)));
+  });
+
+  router.delete('/customers/:customerId/cart/pizzas/:index', (req, res) => {
+    res.json(toJson(carts.remove(req.params.customerId, Index.parse(req.params.index))));
+  });
+
+  router.post('/customers/:customerId/cart/undo', (req, res) => {
+    res.json(toJson(carts.undo(req.params.customerId)));
+  });
+
+  router.post('/customers/:customerId/cart/redo', (req, res) => {
+    res.json(toJson(carts.redo(req.params.customerId)));
+  });
+
+  return router;
+};

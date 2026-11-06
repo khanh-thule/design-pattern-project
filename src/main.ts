@@ -7,7 +7,7 @@ const env = loadEnv();
 const app = createApp(buildContainer());
 
 const server = app.listen(env.PORT, () => {
-  console.log(`🍕 API démarrée sur http://localhost:${env.PORT}`);
+  console.log(`API démarrée sur http://localhost:${env.PORT}`);
 });
 
 const shutdown = () => server.close(() => process.exit(0));

@@ -9,6 +9,10 @@ export class InMemoryOrderRepository implements OrderRepository {
     this.orders.set(order.id, order);
   }
 
+  async findById(id: string): Promise<Order | null> {
+    return this.orders.get(id) ?? null;
+  }
+
   async findByCustomer(customerId: string, status?: OrderStatus): Promise<Order[]> {
     return [...this.orders.values()]
       .filter((order) => order.customerId === customerId)

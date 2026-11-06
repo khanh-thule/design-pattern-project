@@ -14,6 +14,11 @@ export class PrismaOrderRepository implements OrderRepository {
     });
   }
 
+  async findById(id: string): Promise<Order | null> {
+    const row = await this.prisma.order.findUnique({ where: { id } });
+    return row && new Order(row.id, row.customerId, row.createdAt, row.status);
+  }
+
   async findByCustomer(customerId: string, status?: OrderStatus): Promise<Order[]> {
     const rows = await this.prisma.order.findMany({
       where: { customerId, status },
