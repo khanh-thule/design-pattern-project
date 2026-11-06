@@ -117,6 +117,7 @@ export const openApiSpec = {
           ...authErrors,
           404: error('Client introuvable'),
           422: error('Validation refusée (panier vide, minimum, zone, horaires, stock, réduction ou code promo…)'),
+          502: error('Échec du prestataire de paiement : la commande n\'est pas créée, réessayer avec un autre moyen'),
         },
       },
     },

@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
+import { PaymentError } from '../../application/ports/PaymentGateway';
 import { DomainError, ForbiddenError, NotFoundError, UnauthorizedError } from '../../domain/shared/DomainError';
 
 export const errorHandler = (err: Error, _req: Request, res: Response, _next: NextFunction): void => {
@@ -17,6 +18,10 @@ export const errorHandler = (err: Error, _req: Request, res: Response, _next: Ne
   }
   if (err instanceof NotFoundError) {
     res.status(404).json({ error: err.code, message: err.message });
+    return;
+  }
+  if (err instanceof PaymentError) {
+    res.status(502).json({ error: err.code, message: err.message });
     return;
   }
   if (err instanceof DomainError) {
