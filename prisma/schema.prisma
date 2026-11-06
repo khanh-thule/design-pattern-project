@@ -16,8 +16,9 @@ enum OrderStatus {
 
 model Customer {
   id     String  @id
-  name   String
-  orders Order[]
+  name         String
+  passwordHash String
+  orders       Order[]
 }
 
 model Order {

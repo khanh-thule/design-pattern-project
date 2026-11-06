@@ -10,7 +10,7 @@ describe('US 4 - Paiement', () => {
     ['card', '[Carte] processTransaction EUR 25'],
   ])('passe dynamiquement par %s', (method, expectedLog) => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
-    const { payments } = buildContainer();
+    const { payments } = buildContainer({ PORT: 3000, JWT_SECRET: 'x'.repeat(32) });
 
     payments[method].pay(25);
 

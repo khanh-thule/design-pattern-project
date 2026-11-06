@@ -1,6 +1,8 @@
 import express, { Express } from 'express';
 import { Container } from '../../config/container';
 import { errorHandler } from './errorHandler';
+import { requireAuth } from './requireAuth';
+import { authRouter } from './routes/auth.routes';
 import { brandsRouter } from './routes/brands.routes';
 import { cartRouter } from './routes/cart.routes';
 import { customersRouter } from './routes/customers.routes';
@@ -13,6 +15,9 @@ export const createApp = (container: Container): Express => {
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok' });
   });
+
+  app.use('/auth', authRouter(container.auth));
+  app.use('/customers/:customerId', requireAuth(container.auth));
 
   app.use('/brands', brandsRouter(container.brands));
   app.use('/customers', customersRouter(container.customers, container.orders));

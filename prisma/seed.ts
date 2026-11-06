@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -16,9 +17,17 @@ const orders = [
   { id: 'order-5', customerId: 'bob', status: 'pending', createdAt: new Date('2026-11-06T11:00:00Z') },
 ] as const;
 
+/** Mot de passe commun aux clients de démo. */
+const PASSWORD = 'password123';
+
 const main = async () => {
+  const passwordHash = await bcrypt.hash(PASSWORD, 10);
   for (const customer of customers) {
-    await prisma.customer.upsert({ where: { id: customer.id }, create: customer, update: { name: customer.name } });
+    await prisma.customer.upsert({
+      where: { id: customer.id },
+      create: { ...customer, passwordHash },
+      update: { name: customer.name, passwordHash },
+    });
   }
   for (const order of orders) {
     await prisma.order.upsert({ where: { id: order.id }, create: order, update: { status: order.status } });

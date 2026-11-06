@@ -1,0 +1,2 @@
+ALTER TABLE "Customer" ADD COLUMN "passwordHash" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "Customer" ALTER COLUMN "passwordHash" DROP DEFAULT;

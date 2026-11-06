@@ -20,6 +20,7 @@ services:
     environment:
       PORT: 3000
       DATABASE_URL: postgresql://pizza:pizza@db:5432/pizza?schema=public
+      JWT_SECRET: dev-secret-a-changer-en-production-0123456789
     ports:
       - "3000:3000"
     depends_on:

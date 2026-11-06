@@ -1,10 +1,18 @@
 import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
-import { DomainError, NotFoundError } from '../../domain/shared/DomainError';
+import { DomainError, ForbiddenError, NotFoundError, UnauthorizedError } from '../../domain/shared/DomainError';
 
 export const errorHandler = (err: Error, _req: Request, res: Response, _next: NextFunction): void => {
   if (err instanceof ZodError) {
     res.status(400).json({ error: 'INVALID_REQUEST', issues: err.issues });
+    return;
+  }
+  if (err instanceof UnauthorizedError) {
+    res.status(401).json({ error: err.code, message: err.message });
+    return;
+  }
+  if (err instanceof ForbiddenError) {
+    res.status(403).json({ error: err.code, message: err.message });
     return;
   }
   if (err instanceof NotFoundError) {

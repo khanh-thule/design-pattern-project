@@ -1,6 +1,7 @@
 import { CustomerRepository } from '../application/ports/CustomerRepository';
 import { OrderRepository } from '../application/ports/OrderRepository';
 import { PaymentGateway } from '../application/ports/PaymentGateway';
+import { AuthService } from '../application/use-cases/AuthService';
 import { CartService } from '../application/use-cases/CartService';
 import { OrderService } from '../application/use-cases/OrderService';
 import { DeliveryZoneValidator } from '../application/validation/DeliveryZoneValidator';
@@ -12,6 +13,7 @@ import { BrandRegistry } from '../domain/brand/BrandRegistry';
 import { DaMichele } from '../domain/brand/brands/DaMichele';
 import { Pizzium } from '../domain/brand/brands/Pizzium';
 import { Rossopomodoro } from '../domain/brand/brands/Rossopomodoro';
+import { JwtTokenService } from '../infrastructure/auth/JwtTokenService';
 import { EmailListener } from '../infrastructure/notifications/EmailListener';
 import { SmsListener } from '../infrastructure/notifications/SmsListener';
 import { CardPaymentAdapter } from '../infrastructure/payment/CardPaymentAdapter';
@@ -20,11 +22,12 @@ import { PaypalPayment } from '../infrastructure/payment/PaypalPayment';
 import { StripePayment } from '../infrastructure/payment/StripePayment';
 import { PaypalPaymentAdapter } from '../infrastructure/payment/PaypalPaymentAdapter';
 import { StripePaymentAdapter } from '../infrastructure/payment/StripePaymentAdapter';
+import { Env } from './env';
 import { createPrismaClient } from '../infrastructure/persistence/prisma/prismaClient';
 import { PrismaCustomerRepository } from '../infrastructure/persistence/prisma/PrismaCustomerRepository';
 import { PrismaOrderRepository } from '../infrastructure/persistence/prisma/PrismaOrderRepository';
 
-export const buildContainer = () => {
+export const buildContainer = (env: Env) => {
   const brands = new BrandRegistry([new DaMichele(), new Rossopomodoro(), new Pizzium()]);
 
   const payments: Record<string, PaymentGateway> = {
@@ -55,7 +58,9 @@ export const buildContainer = () => {
     customers,
   });
 
-  return { brands, payments, customers, orders, carts, orderService };
+  const auth = new AuthService(customers, new JwtTokenService(env.JWT_SECRET));
+
+  return { brands, payments, customers, orders, carts, orderService, auth };
 };
 
 export type Container = ReturnType<typeof buildContainer>;
