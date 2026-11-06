@@ -1,6 +1,8 @@
 import express, { Express } from 'express';
 import { Container } from '../../config/container';
+import swaggerUi from 'swagger-ui-express';
 import { errorHandler } from './errorHandler';
+import { openApiSpec } from './openapi';
 import { requireAuth } from './requireAuth';
 import { authRouter } from './routes/auth.routes';
 import { brandsRouter } from './routes/brands.routes';
@@ -15,6 +17,8 @@ export const createApp = (container: Container): Express => {
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok' });
   });
+
+  app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
   app.use('/auth', authRouter(container.auth));
   app.use('/customers/:customerId', requireAuth(container.auth));

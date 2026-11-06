@@ -32,6 +32,8 @@ docker compose up --build
 
 L'API est disponible sur http://localhost:3000. Pour vérifier qu'elle répond : `GET /health`.
 
+La documentation Swagger est disponible sur http://localhost:3000/docs.
+
 ### En local
 
 ```bash
