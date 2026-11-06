@@ -1,11 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { Order } from '../../domain/order/Order';
 import { OrderStatusListener } from '../../domain/order/OrderStatusListener';
-import { HappyHourPricing } from '../../domain/pricing/HappyHourPricing';
-import { LoyaltyPricing } from '../../domain/pricing/LoyaltyPricing';
-import { PricingStrategy } from '../../domain/pricing/PricingStrategy';
-import { PromoCodePricing } from '../../domain/pricing/PromoCodePricing';
-import { StandardPricing } from '../../domain/pricing/StandardPricing';
+import { PricingFactory, PricingStrategy } from '../../domain/pricing/PricingStrategy';
 import { DomainError, NotFoundError } from '../../domain/shared/DomainError';
 import { CustomerRepository } from '../ports/CustomerRepository';
 import { OrderRepository } from '../ports/OrderRepository';
@@ -13,11 +9,9 @@ import { PaymentGateway } from '../ports/PaymentGateway';
 import { OrderValidator } from '../validation/OrderValidator';
 import { CartService } from './CartService';
 
-export const PRICINGS = ['standard', 'happy-hour', 'loyalty', 'promo'] as const;
-
 export interface PlaceOrderInput {
   zipCode: string;
-  pricing: (typeof PRICINGS)[number];
+  pricing: string;
   promoCode?: string;
   paymentMethod: string;
 }
@@ -26,7 +20,7 @@ export interface OrderServiceDeps {
   carts: CartService;
   validator: OrderValidator;
   payments: Record<string, PaymentGateway>;
-  promoCodes: Record<string, number>;
+  pricings: Record<string, PricingFactory>;
   listeners: OrderStatusListener[];
   orders: OrderRepository;
   customers: CustomerRepository;
@@ -75,19 +69,9 @@ export class OrderService {
   }
 
   private pricingFor(input: PlaceOrderInput): PricingStrategy {
-    switch (input.pricing) {
-      case 'standard':
-        return new StandardPricing();
-      case 'happy-hour':
-        return new HappyHourPricing();
-      case 'loyalty':
-        return new LoyaltyPricing();
-      case 'promo': {
-        const discount = this.deps.promoCodes[input.promoCode ?? ''];
-        if (discount === undefined) throw new DomainError('Code promo invalide', 'INVALID_PROMO_CODE');
-        return new PromoCodePricing(discount);
-      }
-    }
+    const factory = this.deps.pricings[input.pricing];
+    if (!factory) throw new DomainError(`Réduction "${input.pricing}" inconnue`, 'UNKNOWN_PRICING');
+    return factory(input.promoCode);
   }
 
   private paymentFor(method: string): PaymentGateway {

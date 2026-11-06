@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { OrderService, PRICINGS } from '../../../application/use-cases/OrderService';
+import { OrderService } from '../../../application/use-cases/OrderService';
 import { Order } from '../../../domain/order/Order';
 
 const PlaceOrderBody = z.object({
   zipCode: z.string(),
-  pricing: z.enum(PRICINGS),
+  pricing: z.string(),
   promoCode: z.string().optional(),
   paymentMethod: z.string(),
 });

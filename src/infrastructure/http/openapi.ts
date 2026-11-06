@@ -1,4 +1,3 @@
-import { PRICINGS } from '../../application/use-cases/OrderService';
 import { ORDER_STATUSES } from '../../domain/order/OrderStatus';
 import { INGREDIENTS } from '../../domain/pizza/custom/Ingredient';
 import { SIZES } from '../../domain/pizza/Size';
@@ -107,7 +106,7 @@ export const openApiSpec = {
           required: ['zipCode', 'pricing', 'paymentMethod'],
           properties: {
             zipCode: { type: 'string', example: '75001' },
-            pricing: { type: 'string', enum: PRICINGS },
+            pricing: { type: 'string', example: 'standard' },
             promoCode: { type: 'string', example: 'PIZZA5' },
             paymentMethod: { type: 'string', enum: ['stripe', 'paypal', 'card'] },
           },
@@ -117,7 +116,7 @@ export const openApiSpec = {
           400: error('Corps invalide'),
           ...authErrors,
           404: error('Client introuvable'),
-          422: error('Validation refusée (panier vide, minimum, zone, horaires, stock, code promo…)'),
+          422: error('Validation refusée (panier vide, minimum, zone, horaires, stock, réduction ou code promo…)'),
         },
       },
     },

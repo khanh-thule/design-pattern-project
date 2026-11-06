@@ -13,6 +13,12 @@ import { BrandRegistry } from '../domain/brand/BrandRegistry';
 import { DaMichele } from '../domain/brand/brands/DaMichele';
 import { Pizzium } from '../domain/brand/brands/Pizzium';
 import { Rossopomodoro } from '../domain/brand/brands/Rossopomodoro';
+import { HappyHourPricing } from '../domain/pricing/HappyHourPricing';
+import { LoyaltyPricing } from '../domain/pricing/LoyaltyPricing';
+import { PricingFactory } from '../domain/pricing/PricingStrategy';
+import { PromoCodePricing } from '../domain/pricing/PromoCodePricing';
+import { StandardPricing } from '../domain/pricing/StandardPricing';
+import { DomainError } from '../domain/shared/DomainError';
 import { JwtTokenService } from '../infrastructure/auth/JwtTokenService';
 import { EmailListener } from '../infrastructure/notifications/EmailListener';
 import { SmsListener } from '../infrastructure/notifications/SmsListener';
@@ -47,12 +53,24 @@ export const buildContainer = (env: Env) => {
     .setNext(new OpeningHoursValidator(11, 23))
     .setNext(new StockValidator([]));
 
+  const promoCodes: Record<string, number> = { PIZZA5: 5 };
+  const pricings: Record<string, PricingFactory> = {
+    standard: () => new StandardPricing(),
+    'happy-hour': () => new HappyHourPricing(),
+    loyalty: () => new LoyaltyPricing(),
+    promo: (code) => {
+      const discount = promoCodes[code ?? ''];
+      if (discount === undefined) throw new DomainError('Code promo invalide', 'INVALID_PROMO_CODE');
+      return new PromoCodePricing(discount);
+    },
+  };
+
   const carts = new CartService(brands);
   const orderService = new OrderService({
     carts,
     validator,
     payments,
-    promoCodes: { PIZZA5: 5 },
+    pricings,
     listeners: [new EmailListener(), new SmsListener()],
     orders,
     customers,
