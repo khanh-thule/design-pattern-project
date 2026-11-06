@@ -3,8 +3,8 @@
 API de commande de pizzas pour plusieurs enseignes, réalisée dans le cadre du module **Design Patterns**.
 
 ## Design Pattern utilisés:
-- US1: Factory Method: la classe abstraite contient la logique commune (orderPizza) et délègue aux sous-classes la création des objets propres à chaque enseigne(son menu, sa règle de prix par taille).
-
+- US 1: Factory: la classe abstraite contient la logique commune (orderPizza) et délègue aux sous-classes la création des objets propres à chaque enseigne(son menu, sa règle de prix par taille).
+- US 2: Strategy: chaque réduction (standard, Happy Hour, code promo, fidélité) est un algorithme interchangeable derrière l'interface `PricingStrategy`, donc ajouter une réduction revient à créer une nouvelle classe sans modifier le code existant (Open/Closed).
 
 ## Stack
 

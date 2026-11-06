@@ -9,7 +9,7 @@ export interface MenuEntry {
 }
 
 /**
- * Factory Method
+ * Factory
  * la classe abstraite contient la logique commune (orderPizza) et délègue
  * aux sous-classes la création des objets propres à chaque enseigne
  * (son menu, sa règle de prix par taille).
