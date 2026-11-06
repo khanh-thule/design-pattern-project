@@ -7,9 +7,9 @@ API de commande de pizzas pour plusieurs enseignes, réalisée dans le cadre du 
 - US 2: Strategy: chaque réduction (standard, Happy Hour, code promo, fidélité) est un algorithme interchangeable derrière l'interface `PricingStrategy`, donc ajouter une réduction revient à créer une nouvelle classe sans modifier le code existant (Open/Closed).
 - US 3: Chain of Responsibility : chaque règle de validation est un maillon indépendant qui rejette la commande ou la passe au suivant, donc la première erreur arrête la chaîne et ajouter une règle revient à ajouter un maillon.
 - US 4: Adapter + port hexagonal : le métier ne dépend que du port `PaymentGateway`, et chaque moyen de paiement (signature différente) est branché via un adapter, donc on passe de l'un à l'autre sans modifier le code métier.
-  En cas de problème, l'adapter traduit l'erreur du prestataire en `PaymentError` (HTTP 502) : la commande n'est pas créée, le panier est conservé et le client réessaie avec le moyen de son choix. Pas de bascule automatique vers un autre moyen : basculer d'office un client vers PayPal alors qu'il n'y a pas de compte serait une erreur métier.
+    En cas de problème, l'adapter traduit l'erreur du prestataire en `PaymentError` (HTTP 502) : la commande n'est pas créée, le panier est conservé et le client réessaie avec le moyen de son choix. Pas de bascule automatique vers un autre moyen : basculer d'office un client vers PayPal alors qu'il n'y a pas de compte serait une erreur métier.
 - US 5: Observer : la commande notifie ses listeners via l'interface `OrderStatusListener` sans les connaître, donc ajouter un canal ne modifie pas `Order`, et on active ou désactive un listener avec `subscribe` / `unsubscribe`.
- Statuts de commande : State : chaque statut est une classe qui décide des transitions qu'elle autorise, une transition interdite est refusée avant toute notification.
+    Statuts de commande : State : chaque statut est une classe qui décide des transitions qu'elle autorise, une transition interdite est refusée avant toute notification.
 - US 6: Memento : le panier crée des snapshots opaques de son état que `CartHistory` garde sans pouvoir les lire, donc on fait undo/redo sans exposer les détails internes du panier.
 - US 8: Decorator : chaque ingrédient enveloppe la pizza et ajoute son prix à celui de la pâte, donc on compose n'importe quelle combinaison sans une classe par combinaison, et la taille s'applique ensuite via la règle de l'enseigne.
 - US 9: Repository + port hexagonal : le métier et la route ne dépendent que de `OrderRepository`, et l'adapter Prisma (tri et filtre faits par PostgreSQL) peut être remplacé par l'adapter en mémoire sans rien changer d'autre.
@@ -17,7 +17,7 @@ API de commande de pizzas pour plusieurs enseignes, réalisée dans le cadre du 
 ## SOLID
 - S: chaque règle de validation, stratégie de prix, état de commande et adapter est une petite classe qui fait une seule chose ; `Cart` gère son contenu et `CartHistory` son historique ; `CustomerRepository` lit les données et `PasswordHasher` compare les mots de passe.
 - O: ajouter une enseigne, une réduction, un moyen de paiement, un listener ou une règle de validation se fait en ajoutant une classe et une ligne dans le container, sans modifier le code existant.
-- L: `MenuPizza` et `CustomPizza` sont interchangeables partout où une `Pizza` est attendue (panier, validation, Memento, commande) ; les adapters `OrderRepository` Prisma et en mémoire passent les mêmes tests.
+- L: `MenuPizza` et `CustomPizza` sont interchangeables partout où une `Pizza` est attendue (panier, validation, Memento, commande) ; de même, `OrderService` fonctionne sans modification avec `PrismaOrderRepository` en production et avec `InMemoryOrderRepository` dans les tests
 - I: des ports courts et ciblés (`PaymentGateway.pay`, `OrderStatusListener.onStatusChanged`, `PasswordHasher.verify`, `TokenService.sign/verify`), donc personne ne dépend de méthodes qu'il n'utilise pas.
 - D: les services et les routes dépendent des ports, jamais de Prisma, bcrypt, jsonwebtoken ou des prestataires de paiement.
 
