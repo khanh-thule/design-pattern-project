@@ -1,4 +1,4 @@
-# 🍕 Pizza Marketplace API
+# Pizza Marketplace API
 
 API de commande de pizzas pour plusieurs enseignes, réalisée dans le cadre du module **Design Patterns**.
 
@@ -10,6 +10,7 @@ API de commande de pizzas pour plusieurs enseignes, réalisée dans le cadre du 
 - US 5: Observer : la commande notifie ses listeners via l'interface `OrderStatusListener` sans les connaître, donc ajouter un canal ne modifie pas `Order`, et on active ou désactive un listener avec `subscribe` / `unsubscribe`.
  Statuts de commande : State : chaque statut est une classe qui décide des transitions qu'elle autorise, une transition interdite est refusée avant toute notification.
 - US 6: Memento : le panier crée des snapshots opaques de son état que `CartHistory` garde sans pouvoir les lire, donc on fait undo/redo sans exposer les détails internes du panier.
+- US 8: Decorator : chaque ingrédient enveloppe la pizza et ajoute son prix à celui de la pâte, donc on compose n'importe quelle combinaison sans une classe par combinaison, et la taille s'applique ensuite via la règle de l'enseigne.
 
 ## Stack
 

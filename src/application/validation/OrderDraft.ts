@@ -1,7 +1,7 @@
-import { MenuPizza } from '../../domain/pizza/MenuPizza';
+import { Pizza } from '../../domain/pizza/Pizza';
 
 export interface OrderDraft {
-  readonly pizzas: readonly MenuPizza[];
+  readonly pizzas: readonly Pizza[];
   readonly zipCode: string;
   readonly date: Date;
 }

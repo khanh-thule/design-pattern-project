@@ -1,17 +1,17 @@
 import { NotFoundError } from '../shared/DomainError';
-import { MenuPizza } from '../pizza/MenuPizza';
+import { Pizza } from '../pizza/Pizza';
 import { Size } from '../pizza/Size';
 
 export interface CartMemento {}
 
 class CartSnapshot implements CartMemento {
-  constructor(readonly pizzas: readonly MenuPizza[]) {}
+  constructor(readonly pizzas: readonly Pizza[]) {}
 }
 
 export class Cart {
-  private pizzas: readonly MenuPizza[] = [];
+  private pizzas: readonly Pizza[] = [];
 
-  add(pizza: MenuPizza): void {
+  add(pizza: Pizza): void {
     this.pizzas = [...this.pizzas, pizza];
   }
 
@@ -25,7 +25,7 @@ export class Cart {
     this.pizzas = this.pizzas.map((pizza, i) => (i === index ? pizza.withSize(size) : pizza));
   }
 
-  getPizzas(): readonly MenuPizza[] {
+  getPizzas(): readonly Pizza[] {
     return this.pizzas;
   }
 

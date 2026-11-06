@@ -1,7 +1,8 @@
+import { Pizza } from './Pizza';
 import { Size } from './Size';
 import { SizePricingRule } from './SizePricingRule';
 
-export class MenuPizza {
+export class MenuPizza implements Pizza {
   constructor(
     readonly label: string,
     private readonly basePrice: number,

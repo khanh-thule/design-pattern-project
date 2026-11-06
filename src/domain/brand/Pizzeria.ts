@@ -1,5 +1,9 @@
 import { DomainError } from '../shared/DomainError';
+import { CustomPizza } from '../pizza/custom/CustomPizza';
+import { Ingredient, PizzaBase } from '../pizza/custom/Ingredient';
+import { Dough, IngredientDecorator, PizzaComponent } from '../pizza/custom/PizzaComponent';
 import { MenuPizza } from '../pizza/MenuPizza';
+import { Pizza } from '../pizza/Pizza';
 import { Size } from '../pizza/Size';
 import { SizePricingRule } from '../pizza/SizePricingRule';
 
@@ -7,13 +11,6 @@ export interface MenuEntry {
   readonly name: string;
   readonly basePrice: number;
 }
-
-/**
- * Factory
- * la classe abstraite contient la logique commune (orderPizza) et délègue
- * aux sous-classes la création des objets propres à chaque enseigne
- * (son menu, sa règle de prix par taille).
- */
 
 export abstract class Pizzeria {
   abstract readonly id: string;
@@ -36,5 +33,13 @@ export abstract class Pizzeria {
       throw new DomainError(`"${name}" n'est pas au menu de ${this.name}`, 'UNKNOWN_PIZZA');
     }
     return new MenuPizza(entry.name, entry.basePrice, size, this.createSizePricingRule());
+  }
+
+  customPizza(base: PizzaBase, size: Size, ingredients: readonly Ingredient[]): Pizza {
+    const component = ingredients.reduce<PizzaComponent>(
+      (pizza, ingredient) => new IngredientDecorator(pizza, ingredient),
+      new Dough(base),
+    );
+    return new CustomPizza(component, size, this.createSizePricingRule());
   }
 }
